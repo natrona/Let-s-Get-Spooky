@@ -1,18 +1,31 @@
-import requests
+import os
+import sys
+import subprocess
 import base64
 import json
 import time
 import re
-import os
+
+# ---------- CHECAR E INSTALAR DEPENDÊNCIAS ----------
+dependencias = ["requests"]  # adicione outras bibliotecas se precisar
+
+for lib in dependencias:
+    try:
+        __import__(lib)
+    except ImportError:
+        print(f"Módulo '{lib}' não encontrado. Instalando automaticamente...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", lib])
+        print(f"Módulo '{lib}' instalado com sucesso.")
+
+import requests  # garante que requests esteja importado após a instalação
 
 # ---------- CONFIGURAÇÕES ----------
-# Nome do repositório no GitHub
 REPO_NOME = "Lets-Go-Spooky"
 PASTA_REPO = "images"
 BRANCH = "main"
 URL_PINTEREST = "https://pin.it/31jz4PBft"
 LOG_ARQUIVO = "log_envio.txt"
-INTERVALO = 600  # tempo entre verificações em segundos (10 minutos)
+INTERVALO = 600  # 10 minutos
 
 # ---------- PEGAR TOKEN DO AMBIENTE ----------
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
@@ -94,7 +107,6 @@ def atualizar_log_github(linhas):
 def enviar_imagem(url, idx, log):
     try:
         img_data = requests.get(url, headers=headers_http).content
-        # Nome das imagens com tema de Halloween
         nome_arquivo = f"{PASTA_REPO}/spooky_{str(idx).zfill(3)}.jpg"
 
         check = requests.get(f"https://api.github.com/repos/{REPO}/contents/{nome_arquivo}", headers=headers_github)
